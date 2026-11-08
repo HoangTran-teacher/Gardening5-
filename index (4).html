@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vườn Cây Từ Vựng</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e4f4dc;--card:#fff;--ink:#17361f;--mut:#5d7a64;--line:#c9e2bf;--pri:#2f9e44;--ok:#1a9a4a;--bad:#d6382f;--sun:#ffc83d}
+@media(prefers-color-scheme:dark){:root{--bg:#10281a;--card:#183823;--ink:#ecf8ee;--mut:#a0c0a8;--line:#2d5a3b}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;font-size:17px;min-height:100vh}
+h1,h2,.big{font-family:'Baloo 2','Nunito',system-ui,sans-serif;margin:0}
+#app{max-width:460px;margin:0 auto;padding:14px 12px 40px}
+h1{text-align:center;font-size:36px;line-height:1.1;font-weight:800}
+.sub,.mut{text-align:center;color:var(--mut);margin:6px 0 14px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px;margin-bottom:12px}
+.lab{font-weight:800;margin:0 0 8px}
+button,input,select{font:inherit;color:inherit}
+.btn{display:block;width:100%;padding:13px;border:0;border-radius:14px;background:var(--sun);color:#3a2a00;font-weight:800;font-size:18px;cursor:pointer;box-shadow:0 4px 0 #c99a14;margin-top:10px}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #c99a14}
+.btn.ghost,.chip{background:var(--card);color:var(--ink);border:2px solid var(--line);box-shadow:none}
+.chip{padding:9px 12px;border-radius:12px;font-weight:800;cursor:pointer}
+.btn:disabled,.chip:disabled{opacity:.5;cursor:default}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
+input[type=text]{width:100%;padding:11px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card)}
+.stats{display:flex;gap:8px;justify-content:center;margin:8px 0}
+.stats span{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:5px 14px;font-weight:800}
+.hud{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:20px;margin-bottom:8px}
+.stage{position:relative;touch-action:none;user-select:none}
+canvas.cv{width:100%;aspect-ratio:3/4;display:block;border-radius:14px;border:3px solid var(--line)}
+.ov{position:absolute;inset:0;background:var(--card);border-radius:14px;padding:14px;overflow:auto;border:3px solid var(--line)}
+.ov[hidden]{display:none}
+.pad{display:grid;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,56px);gap:6px;justify-content:center;margin-top:12px}
+.pad button{border:2px solid var(--line);background:var(--card);border-radius:14px;font-size:24px;cursor:pointer}
+.pad .u{grid-column:2}.pad .l{grid-column:1;grid-row:2}.pad .dn{grid-column:2;grid-row:2}.pad .r{grid-column:3;grid-row:2}
+.tag{display:inline-block;padding:3px 10px;border-radius:20px;background:var(--bg);font-weight:800;font-size:14px;color:var(--mut)}
+.big{font-size:64px;text-align:center;line-height:1.1;margin:4px 0}
+.q{font-size:20px;font-weight:800;text-align:center;margin:8px 0 12px}
+.opts{display:grid;gap:8px}
+.opt{padding:11px;border:2px solid var(--line);background:var(--card);border-radius:12px;font-weight:800;font-size:18px;cursor:pointer}
+.opt.right{background:var(--ok);border-color:var(--ok);color:#fff}.opt.wrong{background:var(--bad);border-color:var(--bad);color:#fff}
+.slot{min-height:52px;border:2px dashed var(--line);border-radius:12px;padding:8px;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.tok{padding:8px 12px;border-radius:10px;background:var(--pri);color:#fff;font-weight:800;border:0;cursor:pointer}
+.pool{display:flex;flex-wrap:wrap;gap:6px}.pool .tok{background:var(--card);color:var(--ink);border:2px solid var(--line)}.pool .tok:disabled{opacity:.25}
+.fb{border-radius:14px;padding:10px;margin-top:10px;text-align:center;font-weight:800}
+.fb.good{background:#d8f3e2;color:#0f5f2d}.fb.bad{background:#fde0de;color:#8d1f18}
+.sk{display:flex;align-items:center;gap:12px}.sk canvas{flex:none;background:#c9f0ba;border-radius:10px}.sk div{flex:1}.sk .chip{min-width:92px}
+.sk .d{font-size:13px;color:var(--mut);line-height:1.3}.ill{display:block;margin:0 auto 6px;width:120px;height:120px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.plot{text-align:center;padding:10px;margin:0}.plot b{display:block;margin:4px 0}.plot .d{font-size:13px;color:var(--mut);margin:0}
+.pe{font-size:54px;line-height:1.1;position:relative;display:inline-block;animation:bob 2.6s ease-in-out infinite}
+.bg{position:absolute;right:-16px;top:-4px;font-size:26px;animation:wig .6s infinite alternate}
+@keyframes bob{50%{transform:translateY(-4px)}}@keyframes wig{to{transform:rotate(18deg)}}
+.pop{animation:pop .5s}@keyframes pop{30%{transform:scale(1.06);box-shadow:0 0 0 4px var(--ok)}}
+.bar{height:10px;border-radius:6px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--ok);transition:width .4s}
+.acts{display:flex;gap:6px;margin-top:8px}.act{flex:1;border:2px solid var(--line);background:var(--card);border-radius:12px;padding:6px 0;font-size:22px;cursor:pointer;display:flex;flex-direction:column;align-items:center}
+.act small{font-size:11px;font-weight:800;color:var(--mut)}.act:disabled{opacity:.35;cursor:default}
+.seeds{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:8px 0}.seeds .chip{font-size:24px;padding:6px 10px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#17361f;color:#fff;padding:10px 16px;border-radius:20px;font-weight:800;z-index:20;max-width:90vw;text-align:center}
+.toast[hidden],.modal[hidden]{display:none}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10;overflow:auto;padding:14px}
+.mbox{max-width:440px;margin:3vh auto;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px}
+.wr{background:#fde0de;color:#8d1f18;border-radius:12px;padding:10px;font-weight:800;text-align:center;margin:8px 0}
+.cal{display:block;margin:6px auto 10px;width:100%;max-width:260px;height:auto}
+.trophy{text-align:center;font-size:56px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const $=s=>document.querySelector(s),app=$('#app'),N=15;
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm=s=>s.toLowerCase().replace(/[’']/g,"'").replace(/\s+/g,' ').trim();
+// ====== BÀI HỌC DỰ PHÒNG (nếu không đọc được file Word) ======
+let LESSON='How often do you have ...?',LREADY=false,LERR='',SCR='home';
+let WORDS=[{w:'once a week',vi:'một lần một tuần',e:'1️⃣'},{w:'twice a week',vi:'hai lần một tuần',e:'2️⃣'},{w:'three times a week',vi:'ba lần một tuần',e:'3️⃣'},{w:'every Monday',vi:'thứ Hai hằng tuần',e:'📅'},{w:'every Tuesday',vi:'thứ Ba hằng tuần',e:'📅'},{w:'every Friday',vi:'thứ Sáu hằng tuần',e:'📅'}];
+let SENT=["How often do you have English?","I have it once a week.","I have it twice a week.","I have it three times a week.","I have English every Monday.","I have maths every Tuesday.","When do you have science?","I have it on Monday and Friday.","Do you have maths on Tuesday?","Yes, I do.","No, I don't."];
+const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],SUBJ=['English','maths','science','PE','music','art','history','Vietnamese'];
+// ====== CÂY TRỒNG VÀ CỬA HÀNG (sửa giá ở đây) ======
+const PLANTS=[{id:'sun',n:'Hướng dương',e:'🌻',c:0,r:25},{id:'tom',n:'Cà chua',e:'🍅',c:50,r:45},{id:'tul',n:'Hoa tulip',e:'🌷',c:120,r:80},{id:'str',n:'Dâu tây',e:'🍓',c:200,r:120},{id:'cor',n:'Ngô',e:'🌽',c:300,r:170},{id:'mel',n:'Dưa hấu',e:'🍉',c:420,r:240}];
+const PLOT_COST=[60,120,200,300],UPS=[{k:'can',n:'Bình tưới xịn',ic:'🚿',d:'Tưới nước giúp cây lớn thêm +4%',c:[50,120]},{k:'fert',n:'Phân bón xịn',ic:'🧪',d:'Bón phân giúp cây lớn thêm +6%',c:[80,180]}];
+// ==========================================================
+const PL=id=>PLANTS.find(x=>x.id==id)||PLANTS[0];
+const NEWSAVE=()=>({coins:10,harv:0,seeds:['sun'],plots:2,up:{can:0,fert:0},garden:[{p:null,g:0,bug:0},{p:null,g:0,bug:0}],since:0});
+let SV=NEWSAVE(),STREAK=0,FLASH=-1,TT,Q,lock=0,CTX;
+try{const d=JSON.parse(localStorage.getItem('tv-save')||'null');if(d&&d.garden)SV=Object.assign(NEWSAVE(),d,{up:Object.assign({can:0,fert:0},d.up||{})})}catch(e){}
+const save=()=>{try{localStorage.setItem('tv-save',JSON.stringify(SV))}catch(e){}};
+
+// ---------- tranh lịch tuần ----------
+function calSvg(rows,title){
+ const n=rows.length,cw=n==1?64:50,W=104+n*cw+8,top=(title?16:0)+(n>1?16:0),h=top+7*22+8;
+ let s=`<svg class="cal" viewBox="0 0 ${W} ${h}" role="img" aria-label="Thời khóa biểu trong tuần"><rect width="${W}" height="${h}" rx="10" fill="#fff"/>`;
+ if(title)s+=`<text x="${W/2}" y="13" text-anchor="middle" font-size="12" font-weight="800" fill="#2f9e44" font-family="sans-serif">${esc(title)}</text>`;
+ if(n>1)rows.forEach((r,j)=>{s+=`<text x="${104+j*cw+cw/2}" y="${top-4}" text-anchor="middle" font-size="9" fill="#5d7a64" font-family="sans-serif">Week ${j+1}</text>`});
+ DAYS.forEach((d,i)=>{const y=top+i*22,any=rows.some(r=>r.includes(i));
+  s+=`<rect x="4" y="${y+1}" width="${W-8}" height="20" rx="6" fill="${i%2?'#f4f8f2':'#eaf3e6'}"/><text x="12" y="${y+15}" font-size="12" font-weight="${any?800:500}" fill="${any?'#1f7a33':'#5d7a64'}" font-family="sans-serif">${d}</text>`;
+  rows.forEach((r,j)=>{if(r.includes(i))s+=`<rect x="${104+j*cw+cw/2-14}" y="${y+2}" width="28" height="18" rx="5" fill="#2f9e44"/><text x="${104+j*cw+cw/2}" y="${y+16}" text-anchor="middle" font-size="12" fill="#fff" font-weight="800" font-family="sans-serif">✓</text>`})});
+ return s+'</svg>';
+}
+const dayList=ds=>{const n=ds.map(i=>DAYS[i]);return n.length>1?n.slice(0,-1).join(', ')+' and '+n[n.length-1]:n[0]};
+const rndDays=k=>shuf([0,1,2,3,4]).slice(0,k).sort((a,b)=>a-b);
+const CNT={1:'once a week',2:'twice a week',3:'three times a week'};
+function phraseInfo(w){
+ const t=w.toLowerCase(),m=t.match(/^every (\w+)$/);
+ if(m){const i=DAYS.findIndex(d=>d.toLowerCase()==m[1]);if(i>=0)return{n:1,days:[i]}}
+ return t=='once a week'?{n:1}:t=='twice a week'?{n:2}:t=='three times a week'?{n:3}:null;
+}
+const fam=o=>{const i=phraseInfo(o.w);if(!i)return WORDS;const f=WORDS.filter(x=>{const j=phraseInfo(x.w);return j&&!!j.days==!!i.days});return f.length?f:WORDS};
+const four=o=>{const f=fam(o);return shuf([o.w,...shuf(f.filter(x=>x!=o)).slice(0,3).map(x=>x.w)])};
+function rowsFor(o){
+ const i=phraseInfo(o.w);if(!i)return null;
+ if(i.days)return[i.days,i.days];
+ const a=rndDays(i.n);let b=rndDays(i.n),n=0;while(n++<10&&b.join()==a.join())b=rndDays(i.n);return[a,b];
+}
+const picOf=o=>{const r=rowsFor(o);return r?calSvg(r):`<div class="big">${o.e||'❓'}</div>`};
+const hint=o=>phraseInfo(o.w)?'':`<p class="mut" style="margin:0 0 6px">${esc(o.vi)}</p>`;
+const noun=t=>t.replace(/[.!?]+$/,'');
+
+// ---------- câu hỏi theo độ khó ----------
+// DỄ (tưới nước)
+function qLook(){const o=rnd(WORDS),op=four(o);if(op.length<2)return null;
+ return{kind:'choice',html:`${picOf(o)}${hint(o)}<p class="q">Nhìn tranh, chọn cụm từ đúng</p>`,a:o.w,opts:op}}
+function qOften(){const s=rnd(SUBJ),n=rnd([1,2,3]);
+ return{kind:'choice',html:`${calSvg([rndDays(n)],s)}<p class="q">How often do you have ${s}?</p>`,a:`I have it ${CNT[n]}.`,opts:[1,2,3].map(k=>`I have it ${CNT[k]}.`)}}
+function qFill(){
+ const c=SENT.map(t=>{for(const w of [...WORDS].sort((a,b)=>b.w.length-a.w.length)){const mm=t.match(new RegExp('\\b'+w.w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i')),i=mm?mm.index:-1;if(i>=0&&w.w.length<noun(t).length)return{t,w,i}}}).filter(Boolean);
+ if(!c.length)return null;const {t,w,i}=rnd(c),op=four(w);if(op.length<2)return null;
+ return{kind:'choice',html:`${picOf(w)}${hint(w)}<p class="q">${esc(t.slice(0,i)+'___'+t.slice(i+w.w.length))}</p>`,a:w.w,opts:op}}
+// VỪA (bón phân)
+function qWhen(){const s=rnd(SUBJ),ds=rndDays(rnd([1,2,3])),sets=new Set([ds.join()]),o=[ds];
+ let n=0;while(o.length<4&&n++<40){const d=rndDays(rnd([1,2,3]));if(!sets.has(d.join())){sets.add(d.join());o.push(d)}}
+ return{kind:'choice',html:`${calSvg([ds],s)}<p class="q">When do you have ${s}?</p>`,a:`I have it on ${dayList(ds)}.`,opts:shuf(o.map(d=>`I have it on ${dayList(d)}.`))}}
+function qYesNo(){const s=rnd(SUBJ),ds=rndDays(rnd([1,2,3])),yes=Math.random()<.5,pool=yes?ds:[0,1,2,3,4].filter(d=>!ds.includes(d)),d=rnd(pool);
+ return{kind:'choice',html:`${calSvg([ds],s)}<p class="q">Do you have ${s} on ${DAYS[d]}?</p>`,a:yes?'Yes, I do.':"No, I don't.",opts:['Yes, I do.',"No, I don't."]}}
+function qOrder(){const c=SENT.filter(t=>t.split(' ').length>=3);if(!c.length)return null;const a=rnd(c),t=a.split(' ');let x,n=0;do{x=shuf(t)}while(x.join(' ')==a&&n++<20);
+ return{kind:'order',a,pool:x,built:[]}}
+// KHÓ (bắt sâu)
+function mutations(s){
+ const L=[],add=t=>{if(t&&t!==s&&!L.includes(t))L.push(t)};
+ add(s.replace(/\bdo\b/,'does'));add(s.replace(/\bdoes\b/,'do'));add(s.replace(/\bI have\b/,'I has'));add(s.replace(/\bhave\b/,'has'));
+ add(s.replace(/\bon\b/,'in'));add(s.replace(/ a week/,' week'));add(s.replace(/\btwice\b/,'two time'));add(s.replace(/\bthree times\b/,'three time'));add(s.replace(/\bonce\b/,'one time'));add(s.replace(/\bthinks\b/,'think'));add(s.replace(/\bit's\b/,'its'));add(s.replace(/\blikes\b/,'like'));add(s.replace(/\blike\b/,'likes'));add(s.replace(/\bdoesn't\b/,"don't"));add(s.replace(/\ban\b/,'a'));add(s.replace(/\ba\b/,'an'));add(s.replace(/\bis\b/,'are'));add(s.replace(/'s /,' '));add(s.replace(/(\w+)ing\b/,'$1'));
+ const t=s.split(' ');for(let i=0;i<t.length-1;i++){const u=[...t];[u[i],u[i+1]]=[u[i+1],u[i]];add(u.join(' '))}
+ return L;
+}
+function qMistake(){
+ const c=SENT.filter(t=>t.split(' ').length>=3&&mutations(t).length>=4);if(!c.length)return null;
+ const s=rnd(c),M=mutations(s),wrong=rnd(M),ds=shuf(M.filter(x=>x!=wrong)).slice(0,3);
+ return{kind:'choice',html:`<p class="q">Find and correct the mistake</p><div class="wr">❌ ${esc(wrong)}</div>`,a:s,opts:shuf([s,...ds])}}
+function qWrite(){const o=rnd(WORDS);return{kind:'text',html:`${picOf(o)}<p class="mut" style="margin:0 0 6px">${esc(o.vi)}</p><p class="q">Viết cụm từ tiếng Anh</p>`,a:o.w}}
+function qLetters(){const o=rnd(WORDS),ix=[];[...o.w].forEach((c,i)=>{if(c!=' '&&i>0&&o.w[i-1]!=' ')ix.push(i)});if(!ix.length)return null;
+ const hide=new Set(shuf(ix).slice(0,Math.max(1,Math.min(5,Math.round(ix.length/3)))));
+ return{kind:'text',html:`${picOf(o)}<p class="mut" style="margin:0 0 4px">${esc(o.vi)}</p><p class="q">Điền chữ cái còn thiếu</p><p class="big" style="font-size:26px;letter-spacing:3px;margin:0 0 10px">${esc([...o.w].map((c,i)=>hide.has(i)?'_':c).join(''))}</p>`,a:o.w}}
+function qGeneric(){const o=rnd(WORDS),f=shuf(WORDS.filter(x=>x!=o)).slice(0,3).map(x=>x.w);
+ return{kind:'choice',html:`<div class="big">${o.e||'❓'}</div><p class="mut" style="margin:0 0 6px">${esc(o.vi)}</p><p class="q">Chọn cụm từ đúng</p>`,a:o.w,opts:shuf([o.w,...f])}}
+const hasFreq=()=>WORDS.some(w=>phraseInfo(w.w));
+const isThere=()=>SENT.map(t=>t.match(/^Is there (?:a|an) (.+)\?$/i)).filter(Boolean).map(m=>({m,w:WORDS.find(x=>x.w.toLowerCase()==m[1].toLowerCase())})).filter(x=>x.w);
+function qThere(){const c=isThere();if(!c.length)return null;const {m,w}=rnd(c),yes=Math.random()<.5,oth=c.map(x=>x.w).filter(x=>x!=w),sh=yes?w:(oth.length?rnd(oth):rnd(WORDS.filter(x=>x!=w)));
+ return{kind:'choice',html:`<div class="big">${sh.e||'❓'}</div><p class="q">${esc(m[0])}</p>`,a:yes?'Yes, there is.':"No, there isn't.",opts:['Yes, there is.',"No, there isn't."]}}
+const likeQs=()=>SENT.map(t=>t.match(/^Does (he|she) like (.+)\?$/i)).filter(Boolean).map(m=>({m,w:WORDS.find(x=>x.w.toLowerCase()==m[2].toLowerCase())})).filter(x=>x.w);
+const hasWhatLike=()=>SENT.some(t=>/^What .* does (he|she) like\?$/i.test(t));
+const WHO={he:'👦',she:'👧'};
+function qLike(){const c=likeQs();if(!c.length)return null;const {m,w}=rnd(c),yes=Math.random()<.5,oth=WORDS.filter(x=>x!=w&&x.e),sh=yes?w:rnd(oth.length?oth:WORDS.filter(x=>x!=w)),p=m[1].toLowerCase();
+ return{kind:'choice',html:`<div class="big">${WHO[p]} ${sh.e||'❓'}</div><p class="q">${esc(m[0])}</p>`,a:yes?`Yes, ${p} does.`:`No, ${p} doesn't.`,opts:[`Yes, ${p} does.`,`No, ${p} doesn't.`]}}
+function qWhatLike(){const p=rnd(['he','she']),ws=WORDS.filter(x=>x.e);if(!ws.length)return null;const w=rnd(ws),oth=shuf(WORDS.filter(x=>x!=w)).slice(0,3),P=p=='he'?'He':'She';if(!oth.length)return null;
+ return{kind:'choice',html:`<div class="big">${WHO[p]} ${w.e}</div><p class="q">What school activity does ${p} like?</p>`,a:`${P} likes ${w.w}.`,opts:shuf([w,...oth].map(x=>`${P} likes ${x.w}.`))}}
+const NEG=['difficult','boring'],rxs=t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+const whyQs=()=>SENT.map(t=>t.match(/^Why (does|doesn't) (he|she) like (.+)\?$/i)).filter(Boolean);
+const becAdjs=()=>WORDS.filter(x=>SENT.some(t=>new RegExp("^Because (he|she) thinks it's "+rxs(x.w)+"\\.?$",'i').test(t)));
+function qBecause(){const W=whyQs(),adjs=becAdjs();if(!W.length||adjs.length<2)return null;
+ const m=rnd(W),neg=/doesn/i.test(m[1]),p=m[2].toLowerCase(),pool=adjs.filter(x=>NEG.includes(x.w.toLowerCase())==neg),a=pool.length?rnd(pool):rnd(adjs),oth=shuf(adjs.filter(x=>x!=a)).slice(0,3);
+ return{kind:'choice',html:`<div class="big">${WHO[p]} 💭 ${a.e||'❓'}</div><p class="mut" style="margin:0 0 6px">Bạn ấy nghĩ: ${esc(a.vi)}</p><p class="q">${esc(`Why ${m[1].toLowerCase()} ${p} like ${m[3]}?`)}</p>`,a:`Because ${p} thinks it's ${a.w}.`,opts:shuf([a,...oth].map(x=>`Because ${p} thinks it's ${x.w}.`))}}
+const DIF={water:{tag:'💧 Tưới nước · Dễ',pool:()=>[qLook,qFill,...(hasFreq()?[qOften]:[])]},fert:{tag:'🌿 Bón phân · Vừa',pool:()=>[qOrder,...(isThere().length?[qThere]:[]),...(likeQs().length?[qLike]:[]),...(hasWhatLike()?[qWhatLike]:[]),...(whyQs().length&&becAdjs().length>1?[qBecause]:[]),...(hasFreq()?[qWhen,qYesNo]:[])]},bug:{tag:'🐛 Bắt sâu · Khó',pool:()=>[qMistake,qWrite,qLetters]}};
+const opts=a=>`<div class="opts">${a.map((x,k)=>`<button class="opt" onclick="pick(${k})">${esc(x)}</button>`).join('')}</div>`;
+function makeQ(k){let q=null;for(let n=0;n<12&&!q;n++){try{q=rnd(DIF[k].pool())()}catch(e){q=null}}return q||qGeneric()}
+
+// ---------- màn hình ----------
+function home(){
+ SCR='home';
+ app.innerHTML=`<h1>🌱 Vườn Cây Từ Vựng</h1><p class="sub">Tưới nước, bón phân, bắt sâu bằng cách trả lời câu hỏi. Cây lớn thì thu hoạch kiếm xu!</p>
+ <div class="stats"><span>🪙 ${SV.coins}</span><span>🧺 ${SV.harv}</span></div>
+ <div class="big" style="font-size:60px">🌻🍅🌷</div>
+ <button class="btn" id="go" onclick="garden()" ${LREADY?'':'disabled'}>🌿 Vào vườn</button>
+ <button class="btn ghost" onclick="shop()">🛍️ Cửa hàng</button>
+ <div class="card" style="margin-top:14px"><p class="lab">Cách chơi</p><p style="margin:0;font-size:15px">💧 <b>Tưới nước</b> (Dễ): nhìn hình chọn từ, điền từ vào chỗ trống.<br>🌿 <b>Bón phân</b> (Vừa): hỏi đáp và sắp xếp câu.<br>🐛 <b>Bắt sâu</b> (Khó): sửa câu sai, viết từ. Có sâu thì cây không lớn được!</p></div>
+ <p class="mut" style="margin-top:12px">${!LREADY?'Đang tải bài học...':LERR?`<span style="color:var(--bad)">⚠️ ${esc(LERR)}.<br>Đang dùng bài dự phòng: ${esc(LESSON)}</span>`:'📚 '+esc(LESSON)+' — '+WORDS.length+' từ, '+SENT.length+' câu'}</p>`;
+}
+function plotCard(pl,i){
+ const fl=i==FLASH?' pop':'';
+ if(!pl.p)return `<div class="card plot${fl}"><div class="pe" style="opacity:.5;animation:none">🟫</div><b>Ô đất trống</b><div class="seeds">${SV.seeds.map(id=>`<button class="chip" aria-label="Trồng ${PL(id).n}" onclick="plant(${i},'${id}')">${PL(id).e}</button>`).join('')}</div><p class="d">Chọn hạt giống để trồng</p></div>`;
+ const p=PL(pl.p),ready=pl.g>=100,e=ready?p.e:pl.g<20?'🌱':pl.g<50?'🌿':'🪴';
+ return `<div class="card plot${fl}"><div class="pe">${e}${pl.bug?'<span class="bg">🐛</span>':''}</div><b>${p.n}</b><div class="bar"><i style="width:${pl.g}%"></i></div>`+
+ (ready?`<button class="btn" style="margin-top:8px;padding:9px" onclick="harvest(${i})">🧺 Thu hoạch +${p.r}</button>`:
+ `<div class="acts"><button class="act" aria-label="Tưới nước" ${pl.bug?'disabled':''} onclick="act(${i},'water')">💧<small>Dễ</small></button><button class="act" aria-label="Bón phân" ${pl.bug?'disabled':''} onclick="act(${i},'fert')">🌿<small>Vừa</small></button><button class="act" aria-label="Bắt sâu" ${pl.bug?'':'disabled'} onclick="act(${i},'bug')">🐛<small>Khó</small></button></div>`)+`</div>`;
+}
+function garden(){
+ if(!LREADY)return;SCR='garden';
+ app.innerHTML=`<div class="hud"><span>🪙 ${SV.coins}</span><span>🧺 ${SV.harv}</span><button class="chip" onclick="home()">← Menu</button></div>
+ <div class="grid">${SV.garden.slice(0,SV.plots).map(plotCard).join('')}</div>
+ <p class="mut" style="margin:12px 0 0">💧 Tưới nước = Dễ · 🌿 Bón phân = Vừa · 🐛 Bắt sâu = Khó</p><div id="toast" class="toast" hidden></div><div class="modal" id="modal" hidden></div>`;
+ FLASH=-1;
+}
+function toast(m){const t=$('#toast');if(!t)return;t.textContent=m;t.hidden=false;clearTimeout(TT);TT=setTimeout(()=>{t.hidden=true},2400)}
+function plant(i,id){SV.garden[i]={p:id,g:0,bug:0};FLASH=i;save();garden()}
+function harvest(i){const pl=SV.garden[i],p=PL(pl.p);SV.coins+=p.r;SV.harv++;SV.garden[i]={p:null,g:0,bug:0};FLASH=i;save();garden();toast('🧺 Thu hoạch '+p.n+' +'+p.r+' 🪙')}
+
+// ---------- hành động chăm sóc ----------
+function act(i,k){
+ const pl=SV.garden[i];if(!LREADY||!pl||!pl.p||pl.g>=100)return;
+ if(k!='bug'&&pl.bug)return toast('Có sâu! Hãy bắt sâu trước 🐛');
+ if(k=='bug'&&!pl.bug)return;
+ CTX={i,k};Q=makeQ(k);lock=0;
+ const q=Q,m=$('#modal');m.hidden=false;
+ m.innerHTML=`<div class="mbox"><span class="tag">${DIF[k].tag}</span><div id="q">${q.html||''}${q.kind=='choice'?opts(q.opts):q.kind=='text'?`<input type="text" id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Gõ đáp án..."><button class="btn" onclick="chkT()">Kiểm tra</button>`:'<div id="ord"></div>'}</div><div id="fb"></div></div>`;
+ if(q.kind=='text'){const e=$('#ans');e.focus();e.onkeydown=ev=>{if(ev.key=='Enter')chkT()}}
+ if(q.kind=='order')drawOrder();
+}
+function pick(k){if(lock)return;document.querySelectorAll('.opt').forEach((e,j)=>{if(Q.opts[j]==Q.a)e.classList.add('right');else if(j==k)e.classList.add('wrong')});submit(Q.opts[k]==Q.a,Q.a)}
+function chkT(){const v=$('#ans').value;if(!v.trim())return;submit(norm(v)==norm(Q.a),Q.a)}
+function drawOrder(){
+ $('#ord').innerHTML=`<p class="q">Sắp xếp các từ thành câu đúng</p><div class="slot">${Q.built.map(k=>`<button class="tok" onclick="rem(${k})">${esc(Q.pool[k])}</button>`).join('')}</div>
+ <div class="pool">${Q.pool.map((t,k)=>`<button class="tok" ${Q.built.includes(k)?'disabled':''} onclick="add(${k})">${esc(t)}</button>`).join('')}</div><button class="btn" onclick="chkO()">Kiểm tra</button>`;
+}
+function add(k){if(lock)return;Q.built.push(k);drawOrder()}
+function rem(k){if(lock)return;Q.built=Q.built.filter(x=>x!=k);drawOrder()}
+function chkO(){if(!Q.built.length)return;submit(norm(Q.built.map(k=>Q.pool[k]).join(' '))==norm(Q.a),Q.a)}
+function reward(k){const b=Math.min(STREAK,5);return k=='water'?{g:10+4*SV.up.can,c:2+b}:k=='fert'?{g:20+6*SV.up.fert,c:4+b}:{g:0,c:8+b}}
+function submit(ok,ans){
+ if(lock)return;lock=1;
+ document.querySelectorAll('#q button,#q input').forEach(e=>e.disabled=true);
+ const k=CTX.k,r=reward(k),f=$('#fb');f.className='fb '+(ok?'good':'bad');
+ f.innerHTML=(ok?`✅ Chính xác! ${r.g?`Cây lớn thêm +${r.g}%, `:'Đã bắt được sâu! '}+${r.c} 🪙`:`❌ Chưa đúng. Đáp án: <b>${esc(ans)}</b>${k!='bug'?' (cây bị héo 5%)':''}`)+`<button class="btn" onclick="fin(${ok})">Tiếp tục</button>`;
+ f.scrollIntoView({block:'nearest'});
+}
+function fin(ok){
+ const {i,k}=CTX,pl=SV.garden[i],r=reward(k);let msg;
+ $('#modal').hidden=true;
+ if(ok){pl.g=Math.min(100,pl.g+r.g);if(k=='bug')pl.bug=0;SV.coins+=r.c;STREAK++;msg=k=='bug'?'🐛 Bắt được sâu! +'+r.c+' 🪙':(k=='water'?'💧':'🌿')+' +'+r.g+'% · +'+r.c+' 🪙'+(STREAK>1?' · 🔥 x'+STREAK:'')}
+ else{STREAK=0;if(k!='bug')pl.g=Math.max(0,pl.g-5);msg='Cố lên nhé! 💪'}
+ if(pl.g>=100){pl.g=100;pl.bug=0;msg='🌟 Cây đã lớn! Hãy thu hoạch!'}
+ SV.since++;
+ const cand=SV.garden.slice(0,SV.plots).map((p,j)=>({p,j})).filter(x=>x.p.p&&x.p.g>=15&&x.p.g<100&&!x.p.bug);
+ if(cand.length&&(SV.since>=4||Math.random()<.3)){const x=rnd(cand);x.p.bug=1;SV.since=0;msg+=' · 🐛 Có sâu ở ô '+(x.j+1)+'!'}
+ save();FLASH=i;garden();toast(msg);
+}
+
+// ---------- cửa hàng ----------
+function shop(){
+ SCR='shop';
+ const seeds=PLANTS.map(p=>`<div class="card sk"><div class="ic">${p.e}</div><div><b>${p.n}</b><div class="d">Thu hoạch +${p.r} 🪙</div></div>${SV.seeds.includes(p.id)?'<button class="chip" disabled>Đã có</button>':`<button class="chip" ${SV.coins<p.c?'disabled':''} onclick="buySeed('${p.id}')">${SV.coins<p.c?'🔒':'Mua'} 🪙${p.c}</button>`}</div>`).join('');
+ const nc=PLOT_COST[SV.plots-2];
+ const plots=`<div class="card sk"><div class="ic">🟫</div><div><b>Thêm ô đất</b><div class="d">Đang có ${SV.plots}/6 ô</div></div>${SV.plots>=6?'<button class="chip" disabled>Tối đa</button>':`<button class="chip" ${SV.coins<nc?'disabled':''} onclick="buyPlot()">${SV.coins<nc?'🔒':'Mua'} 🪙${nc}</button>`}</div>`;
+ const ups=UPS.map(u=>{const lv=SV.up[u.k],mx=u.c.length;return `<div class="card sk"><div class="ic">${u.ic}</div><div><b>${u.n}</b> <span class="d">${'●'.repeat(lv)+'○'.repeat(mx-lv)}</span><div class="d">${u.d}</div></div>${lv>=mx?'<button class="chip" disabled>Tối đa</button>':`<button class="chip" ${SV.coins<u.c[lv]?'disabled':''} onclick="upg('${u.k}')">${SV.coins<u.c[lv]?'🔒':'Nâng'} 🪙${u.c[lv]}</button>`}</div>`}).join('');
+ app.innerHTML=`<h1 style="font-size:28px">🛍️ Cửa hàng</h1><div class="stats"><span>🪙 ${SV.coins}</span></div>
+ <p class="lab">🌱 Hạt giống</p>${seeds}<p class="lab" style="margin-top:14px">🟫 Đất</p>${plots}<p class="lab" style="margin-top:14px">⚡ Dụng cụ</p>${ups}
+ <button class="btn ghost" onclick="home()">← Quay lại</button><button class="chip" style="width:100%;margin-top:12px" onclick="resetAll()">Xóa dữ liệu, chơi lại từ đầu</button>`;
+}
+function buySeed(id){const p=PL(id);if(SV.coins<p.c||SV.seeds.includes(id))return;SV.coins-=p.c;SV.seeds.push(id);save();shop()}
+function buyPlot(){const c=PLOT_COST[SV.plots-2];if(c==null||SV.coins<c)return;SV.coins-=c;SV.plots++;SV.garden.push({p:null,g:0,bug:0});save();shop()}
+function upg(k){const u=UPS.find(x=>x.k==k),c=u.c[SV.up[k]];if(c==null||SV.coins<c)return;SV.coins-=c;SV.up[k]++;save();shop()}
+function resetAll(){if(confirm('Xóa hết xu, cây và đồ đã mua?')){SV=NEWSAVE();save();home()}}
+
+// ---------- đọc bài học từ file Word ----------
+function parseLesson(t){
+ const W=[],S=[];let sec='',T='';
+ t.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).forEach(l=>{
+  const h=l.replace(/^#+\s*/,'').replace(/[:：]\s*$/,'');
+  if(h.length<25&&!h.includes('|')){
+   if(/^(từ vựng|vocab|words)/i.test(h)){sec='w';return}
+   if(/^(mẫu câu|sentence|pattern|câu)/i.test(h)){sec='s';return}
+  }
+  if(!sec){if(!T&&l.length<60)T=l.replace(/^Bài học:\s*/i,'');return}
+  l=l.replace(/^\d+[.)]\s*/,'');
+  if(sec=='w'){const x=l.split(/\s*[|\t]\s*/);if(x[0]&&x[1])W.push({w:x[0],vi:x[1],e:x[2]||''})}
+  else S.push(l);
+ });
+ return{W,S,T};
+}
+home();
+home();
+// Đọc file Word (.docx) trực tiếp, không cần thư viện ngoài
+async function docxText(buf){
+ const u=new Uint8Array(buf),dv=new DataView(buf);
+ let e=u.length-22;while(e>=0&&dv.getUint32(e,true)!=0x06054b50)e--;
+ if(e<0)throw new Error('File không phải là .docx');
+ const n=dv.getUint16(e+10,true);let p=dv.getUint32(e+16,true);
+ for(let i=0;i<n;i++){
+  const m=dv.getUint16(p+10,true),cs=dv.getUint32(p+20,true),nl=dv.getUint16(p+28,true),xl=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),lo=dv.getUint32(p+42,true);
+  if(new TextDecoder().decode(u.subarray(p+46,p+46+nl))=='word/document.xml'){
+   const ds=lo+30+dv.getUint16(lo+26,true)+dv.getUint16(lo+28,true),data=u.subarray(ds,ds+cs);
+   let raw=data;
+   if(m!=0){if(typeof DecompressionStream=='undefined')throw new Error('Trình duyệt quá cũ, hãy cập nhật hoặc dùng Chrome');
+    raw=new Uint8Array(await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer())}
+   return new TextDecoder().decode(raw).split('</w:p>').map(x=>[...x.matchAll(/<w:tab\/>|<w:br\/>|<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g)].map(t=>t[1]!==undefined?t[1]:t[0]=='<w:tab/>'?'\t':'\n').join('').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,'&')).join('\n');
+  }
+  p+=46+nl+xl+cl;
+ }
+ throw new Error('Không tìm thấy nội dung trong file Word');
+}
+// Tự đọc file bai-hoc.docx (hoặc ?bai=ten-file) nằm cạnh index.html trên GitHub
+(async()=>{
+ const n=(new URLSearchParams(location.search).get('bai')||'bai-hoc').replace(/[^\w-]/g,'');
+ try{
+  if(location.protocol=='file:')throw new Error('Đang mở trực tiếp từ máy nên chưa đọc được '+n+'.docx (hãy mở bằng link GitHub Pages)');
+  const r=await fetch(n+'.docx?v='+Date.now(),{cache:'no-store'});
+  if(!r.ok)throw new Error('Không tìm thấy '+n+'.docx cạnh index.html (kiểm tra đúng tên file)');
+  const x=parseLesson(await docxText(await r.arrayBuffer()));
+  if(x.W.length<2||!x.S.length)throw new Error('Đã mở '+n+'.docx nhưng không đọc được mục "Từ vựng" (từ | nghĩa | emoji) và "Mẫu câu"');
+  WORDS=x.W;SENT=x.S;LESSON=x.T||n;LERR='';
+ }catch(e){LERR=String(e.message||e)}
+ LREADY=true;if(SCR=='home')home();
+})();
+</script>
+</body>
+</html>
